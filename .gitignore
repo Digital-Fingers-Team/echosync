@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+preview/
+run.log
+paper.txt
+EchoSync_Research_Paper.pdf

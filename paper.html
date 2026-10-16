@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EchoSync Research Paper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=block" rel="stylesheet">
+<style>
+@page { size: A4; margin: 20mm 19mm 20mm 19mm;
+  @bottom-center { content: counter(page); } }
+:root { --ink:#0b0b0b; --ink2:#52514e; --rule:#d9d8d3; --accent:#2a78d6; --tint:#f3f6fb; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: "Source Serif 4", Georgia, serif; font-size: 10.4pt; line-height: 1.45;
+  color: var(--ink); background: #fff; margin: 0; hyphens: auto; text-align: justify; }
+h1, h2, h3, .sans, figcaption, table, .kw, .meta, .abstract-label { font-family: Inter, "DejaVu Sans", sans-serif; }
+h1 { font-size: 17.5pt; line-height: 1.2; text-align: center; margin: 0 0 6pt; font-weight: 700; letter-spacing: -0.01em; }
+.meta { text-align: center; font-size: 9pt; color: var(--ink2); margin-bottom: 12pt; }
+h2 { font-size: 11.5pt; margin: 15pt 0 5pt; font-weight: 700; break-after: avoid; }
+h3 { font-size: 10pt; margin: 10pt 0 3pt; font-weight: 600; break-after: avoid; }
+p { margin: 0 0 6pt; }
+.abstract { border-top: 1.2pt solid var(--ink); border-bottom: 0.6pt solid var(--rule); padding: 8pt 0 8pt; margin-bottom: 10pt; font-size: 9.8pt; }
+.abstract-label { font-weight: 700; font-size: 9pt; letter-spacing: .04em; text-transform: uppercase; }
+.kw { font-size: 8.6pt; color: var(--ink2); margin-top: 5pt; text-align: left; }
+figure { margin: 8pt 0 10pt; break-inside: avoid; text-align: center; }
+figure img { max-width: 100%; }
+figcaption { font-size: 8.4pt; color: var(--ink2); text-align: left; margin-top: 3pt; line-height: 1.35; }
+figcaption b { color: var(--ink); }
+table { border-collapse: collapse; width: 100%; font-size: 8.4pt; margin: 4pt 0 10pt; break-inside: avoid; text-align: left; }
+caption { caption-side: top; text-align: left; font-size: 8.4pt; color: var(--ink2); padding-bottom: 3pt; }
+caption b { color: var(--ink); }
+th, td { padding: 2.6pt 5pt; border-bottom: 0.5pt solid var(--rule); vertical-align: top; }
+thead th { border-top: 1pt solid var(--ink); border-bottom: 0.8pt solid var(--ink); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 1pt solid var(--ink); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.box { background: var(--tint); border-left: 2.5pt solid var(--accent); padding: 6pt 9pt; margin: 6pt 0 9pt; font-size: 9.6pt; break-inside: avoid; }
+.eq { text-align: center; margin: 5pt 0 7pt; font-style: italic; }
+.eq .no { float: right; font-style: normal; }
+code, .mono { font-family: "JetBrains Mono", "Source Code Pro", monospace; font-size: 8.6pt; }
+ol.refs { font-size: 8.6pt; padding-left: 16pt; text-align: left; }
+ol.refs li { margin-bottom: 2.5pt; }
+.ok { color: #0b6b3a; font-weight: 600; } .no-ok { color: #a12a1f; font-weight: 600; } .part { color: #8a5a00; font-weight: 600; }
+ul { margin: 0 0 6pt; padding-left: 15pt; } li { margin-bottom: 2pt; }
+.small { font-size: 8.6pt; color: var(--ink2); }
+</style>
+</head>
+<body>
+<h1>Protocol-Level Optimization and Evaluation of EchoSync:<br>A Broadcast-Based Data Synchronization Framework<br>for Resource-Constrained LoRa Networks</h1>
+<div class="meta">[Student name] · [School, City, Country] · ISEF category: Systems Software (SOFT)</div>
+
+<div class="abstract">
+<span class="abstract-label">Abstract</span>&nbsp;
+Nodes in off-grid LoRa networks must keep shared datasets consistent, but pairwise synchronization scales linearly with node count under strict 1% duty-cycle limits. EchoSync lets one elected node broadcast a single stream of Rateless Invertible Bloom Lookup Table (RIBLT) coded symbols from which every receiver decodes its own, different set difference. We implemented the RIBLT codec, a LoRa airtime and duty-cycle model, Gilbert–Elliott packet loss and a radio energy model in a discrete-event simulator, validated against the Semtech airtime formula and published RIBLT overhead, and ran 2,782 simulations. Two design flaws surfaced and were corrected. First, a single sender's stream cannot deliver records that only receivers hold, so the original one-phase design left 0% of nodes fully synchronized; a two-phase protocol (broadcast, overheard upload, catch-up poll) reached 100%. Second, RIBLT has a heavy tail under frame loss: at 30% loss, receivers that missed the early dense symbols drove the stream to 20.7 coded symbols per differing record instead of 1.6. A 64-frame NACK-driven prefix repair cut airtime 3.2× and timeout recoveries 115×. At 10 nodes, EchoSync used 88% less airtime and converged 93% faster than sequential pairwise RIBLT; at 100 nodes, 99% less airtime (3.2 h vs 45 days). Convergence was 100% at every tested loss rate up to 30%, and a last-writer-wins CRDT reached identical state in 300/300 runs. Without loss, a broadcast lasted 1.01× the slowest single session (H1 supported); under 10% loss it lasted up to 1.7×. Hardware validation on ESP32/SX127x nodes is the next step.
+<div class="kw"><b>Keywords:</b> LoRa, LPWAN, set reconciliation, RIBLT, CRDT, broadcast protocols, duty cycle, discrete-event simulation</div>
+</div>
+
+<h2>1. Introduction</h2>
+<p>Edge devices that operate without stable internet, such as field sensors, disaster-response kits and rural community networks, often need to agree on a shared dataset: a log of readings, a message board, a list of alerts. Conventional synchronization uses either pairwise sessions or network-wide flooding. On LoRa physical layers both are expensive. Every transmission spends scarce airtime, and European regulations cap each device at 1% of the time in the common 868 MHz sub-band [14, 21]. Pairwise synchronization needs a number of sessions that grows linearly with the number of nodes, and flooding repeats data that most receivers already hold.</p>
+<p>EchoSync replaces many sessions with one broadcast. An elected sender streams rateless coded symbols derived from Rateless Invertible Bloom Lookup Tables (RIBLT) [1]. Because the coded symbols are linear in the sender's set, each receiver subtracts its own local symbols and decodes its <i>own</i> difference from the <i>same</i> stream, however far behind it is. The original proposal described this idea and an evaluation plan. This paper implements and evaluates it, and reports what the evaluation changed.</p>
+<div class="box"><b>Contributions.</b>
+(1) A demonstration that one-phase broadcast reconciliation cannot reach the union of all nodes' data, and a two-phase protocol that provably can.
+(2) A previously unreported heavy-tail failure of RIBLT under frame loss, and a <i>prefix repair</i> mechanism that removes it.
+(3) An open, tested simulator that includes a full RIBLT codec, the Semtech airtime model, duty-cycle enforcement, bursty loss and an energy model.
+(4) A quantitative test of the original three hypotheses across 2,782 simulated runs, with the verdicts reported as measured, including where a hypothesis failed.</div>
+
+<h2>2. Scientific Background</h2>
+<h3>2.1 LoRa PHY and LPWAN constraints</h3>
+<p>LoRa uses chirp spread spectrum: a spreading factor SF ∈ {7…12} trades data rate for range. The time on air of one frame with a payload of PL bytes, bandwidth BW, coding rate CR (1 = 4/5), an 8-symbol preamble and explicit header with CRC is [9]:</p>
+<p class="eq">T<sub>sym</sub> = 2<sup>SF</sup>/BW, &nbsp; T = (n<sub>pre</sub> + 4.25)·T<sub>sym</sub> + [8 + max(⌈(8PL − 4SF + 44)/(4(SF − 2DE))⌉·(CR + 4), 0)]·T<sub>sym</sub><span class="no">(1)</span></p>
+<p>Here DE = 1 (low-data-rate optimization) when T<sub>sym</sub> &gt; 16 ms. A device that transmits for T seconds must stay silent for T(1/δ − 1) seconds, where δ is the duty-cycle limit (δ = 1% in the EU868 g1 sub-band). Table 1 shows the frame sizes and airtimes used in this study. The table makes the core constraint concrete: at SF9, one full frame costs 0.62 s of airtime and then 61 s of silence.</p>
+<table>
+<caption><b>Table 1.</b> Frames used by EchoSync (125 kHz, CR 4/5). Payload limits follow the LoRaWAN EU868 regional parameters [15].</caption>
+<thead><tr><th>SF</th><th class="n">Max payload (B)</th><th class="n">Symbols / frame</th><th class="n">Symbol frame (B)</th><th class="n">Airtime (ms)</th><th class="n">Silence at 1% (s)</th><th class="n">Records / data frame</th></tr></thead>
+<tbody>
+<tr><td>7</td><td class="n">222</td><td class="n">8</td><td class="n">216</td><td class="n">343.3</td><td class="n">34.0</td><td class="n">13</td></tr>
+<tr><td>9 (default)</td><td class="n">115</td><td class="n">4</td><td class="n">112</td><td class="n">615.4</td><td class="n">60.9</td><td class="n">6</td></tr>
+<tr><td>12</td><td class="n">51</td><td class="n">1</td><td class="n">34</td><td class="n">1810.4</td><td class="n">179.2</td><td class="n">2</td></tr>
+</tbody></table>
+
+<h3>2.2 Set reconciliation and RIBLT</h3>
+<p>Set reconciliation lets two parties learn the symmetric difference of their sets, of size d, using communication proportional to d rather than to the set size [4]. Invertible Bloom Lookup Tables (IBLTs) [2, 3] achieve this with a table whose size must be chosen in advance from an estimate of d. RIBLT [1] removes the estimate. Each item maps to coded-symbol index 0 and then to a pseudo-random sequence of indices that grows sparser (the probability of mapping to index i is about 1/(1 + i/2)). The sender can therefore emit an endless stream, and the receiver stops as soon as peeling decoding succeeds. A coded symbol stores the XOR of the items, the XOR of their 64-bit hashes, and a signed count. Yang et al. report that the number of coded symbols needed approaches 1.35·d for large d, with a higher ratio for small d [1].</p>
+<p>The property EchoSync relies on is <b>linearity</b>. A receiver that subtracts the symbols of its own set from the sender's symbols obtains exactly the coded symbols of the difference. One stream therefore serves receivers with completely different gaps, and the stream only needs to be as long as the largest gap requires.</p>
+
+<h3>2.3 Conflict-free replicated data types</h3>
+<p>EchoSync synchronizes a grow-only set of immutable <i>operations</i>. Merging two such sets by union is commutative, associative and idempotent, so any state-based CRDT [5] defined as a deterministic fold over the operation set converges once the sets are equal. In our evaluation the fold is a last-writer-wins map ordered by Lamport timestamp [17] and then node id.</p>
+
+<h2>3. Related Work and Research Problem</h2>
+<p>Gossip and tree dissemination in wireless sensor networks, notably Trickle [6], suppress redundant transmissions by listening before speaking. They detect inconsistency cheaply, but they still ship data per item and per neighbor. Digital-fountain approaches [7, 8] showed that rateless codes make one broadcast useful to receivers with different losses. EchoSync applies the same idea to receivers with different <i>data</i>. Vector clocks and Merkle-tree anti-entropy are standard in distributed databases, but they need several round trips, which costs minutes per exchange under a 1% duty cycle. Studies of LoRa capacity [11–13] show that collisions and duty cycle, not bit rate, are the limiting factors at scale. That motivates minimizing the number of transmissions rather than their size. Rateless reconciliation has been adopted for local-first collaboration software [18, 20], but it has not been evaluated on ultra-constrained broadcast media.</p>
+<p>Deploying broadcast set reconciliation on LoRa raises four problems: (1) receivers with very different state gaps; (2) frame loss on fading channels, which causes local decoding failures; (3) convergence verification without acknowledgment storms; and (4) collisions among control and request frames. Section 5 addresses each one.</p>
+
+<h2>4. Research Questions and Hypotheses</h2>
+<p><b>RQ1.</b> Does broadcasting rateless coded symbols reduce total network airtime compared with sequential pairwise synchronization as node density varies?<br>
+<b>RQ2.</b> How do heterogeneous state gaps among receivers affect broadcast duration and airtime efficiency?<br>
+<b>RQ3.</b> Can EchoSync converge robustly under 10–30% packet loss without excessive control overhead?</p>
+<p>The hypotheses are kept exactly as originally stated. Because some of them were ambiguous, we fixed operational definitions <i>before</i> running the final experiments:</p>
+<ul>
+<li><b>H1:</b> broadcast execution time ≤ 1.1× the largest pairwise session, and total synchronization time reduced by ≥ 50% compared with sequential pairwise sync. <i>Measured as</i> the wall time of phase 1 divided by the wall time of the slowest single-receiver session run with the identical mechanism from the same initial state (H1a), and 1 − T<sub>EchoSync</sub>/T<sub>pairwise</sub> to full convergence (H1b).</li>
+<li><b>H2:</b> the number of transmitted coded symbols approaches the theoretical minimum within a 15% margin. The phrase "theoretical minimum" is ambiguous, so we report both readings: (i) the information bound d<sub>max</sub>, the largest receiver gap; and (ii) the symbols a unicast RIBLT session needs for the same d (the minimum for <i>this code</i>).</li>
+<li><b>H3:</b> convergence succeeds under 10–30% loss when supplementary symbol requests are used. <i>Measured as</i> the fraction of runs in which every node holds the union and all fingerprints match before a 120-day simulated timeout.</li>
+</ul>
+
+<h2>5. Protocol Design</h2>
+<figure><img src="fig_protocol.svg" style="width:100%">
+<figcaption><b>Figure 1.</b> EchoSync phases. Phase 1: the leader streams RIBLT symbols in batches; after each batch, receivers that have not decoded send a request (REQ) in a short contention window, and the NACK bitmap in the request triggers retransmission (repair) of lost early frames. Receivers that decode sleep. Phase U: receivers upload, in roster order, the records the leader lacks; other nodes overhear them. Phase 2: a POLL carries the union fingerprint, and only nodes that are still behind request a catch-up stream.</figcaption></figure>
+
+<h3>5.1 Data model and frames</h3>
+<p>Each record (CRDT operation) is a fixed 16-byte item, so a coded symbol carries the record itself in its sum field and no separate data-transfer round is needed. A coded symbol is 26 bytes on air: a 16 B sum, an 8 B checksum, and a 2 B count stored mod 2<sup>16</sup>, which is enough to recognize ±1. Table 2 lists the frame formats.</p>
+<table>
+<caption><b>Table 2.</b> Frame formats (bytes). Every frame starts with an 8 B header: type, sender id (2), session (1), first symbol index (3), count (1).</caption>
+<thead><tr><th>Frame</th><th class="n">Size</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td>BEACON</td><td class="n">20</td><td>header, set size (4), 64-bit state fingerprint (XOR of record hashes)</td></tr>
+<tr><td>SYMBOLS</td><td class="n">8 + 26K</td><td>K consecutive coded symbols (K = 8 / 4 / 1 at SF7 / 9 / 12)</td></tr>
+<tr><td>REQ (+NACK)</td><td class="n">8 (+8)</td><td>"need more symbols", plus a 64-bit bitmap of lost frames among the first 64</td></tr>
+<tr><td>DATA / ACK</td><td class="n">8 + 16r / 9</td><td>r packed records / 8-bit bitmap of received frames in a burst</td></tr>
+<tr><td>POLL</td><td class="n">20</td><td>union size and fingerprint after the upload phase</td></tr>
+</tbody></table>
+
+<h3>5.2 Discovery and leader election without messages</h3>
+<p>Every node sends one beacon. The leader is chosen deterministically from what every node has already heard: the largest set, with ties broken by the lowest id. No election messages, rounds or votes are needed. If all fingerprints match, nothing is sent. Beacons are periodic in deployment; the simulator assumes the roster is complete, which is a stated limitation (Section 9).</p>
+
+<h3>5.3 Phase 1: broadcast reconciliation</h3>
+<p>The leader streams symbol frames in batches of B frames (default B = 2). The first batch is sized from the beacons' set-size gaps (⌈1.35·max|ΔSize|/K⌉ frames), which helps a node that joins late with an empty set. Each receiver feeds received symbols into a streaming peeling decoder. It recognizes completion by <b>fingerprint verification</b>: the XOR of the hashes of recovered items must equal fp(S) ⊕ fp(R), and the signed count must equal |S| − |R|. Both values come from beacons, so a receiver needs no "end" message and loses nothing if symbol 0 is dropped. A receiver that has decoded stops listening (<b>early sleep</b>).</p>
+
+<h3>5.4 Request windows, collisions and prefix repair</h3>
+<p>After each batch the leader listens for a short window of four slots. Every receiver that has not decoded sends a REQ in a random slot. The leader only needs to detect <i>activity</i>, using LoRa Channel Activity Detection, so collisions never stop the stream; this solves the acknowledgment-storm problem by design. If no request is heard but a receiver is still behind, that receiver retries after 30 s, and the stream resumes from where it stopped. Because the code is rateless, no symbol is wasted.</p>
+<p><b>Prefix repair.</b> Early experiments showed a failure mode that the original proposal did not anticipate. RIBLT places every item in symbol 0 and concentrates mappings in the first indices. A receiver that loses those dense early frames must wait for the increasingly sparse later symbols, which happen to contain its remaining items only rarely. With 80 missing items and 20% frame loss, the median receiver needed 1.85·d symbols, but the 99th percentile needed 6.9·d and the worst case 427·d. We therefore extended REQ with a 64-bit NACK bitmap of lost frames among the first 64. A request that lands alone in its slot is decoded, and the leader retransmits the union of the reported frames before the next batch. Retransmissions help every lagging receiver at once. With repair, the same test had a 99th percentile of 1.9·d.</p>
+
+<h3>5.5 Why one phase cannot converge, and phases U and 2</h3>
+<div class="box"><b>Observation.</b> Let S be the leader's set and R<sub>i</sub> the receivers' sets. After phase 1, receiver i holds S ∪ R<sub>i</sub>. A record x ∈ R<sub>i</sub> \ S can never reach receiver j ≠ i, because the stream encodes only S. All nodes reach the union U = ⋃R<sub>i</sub> only if R<sub>i</sub> ⊆ S for every i, that is, only if the leader already holds everything. In any network where nodes generate their own data this condition fails, and the original single-phase design never converges.</div>
+<p>Decoding phase 1 tells each receiver exactly which of its records the leader lacks (the items with negative sign). In <b>phase U</b>, receivers upload those records in roster order, using reliable packed DATA frames with ACKs. Other receivers overhear the uploads and skip records they have already heard, so each record usually crosses the channel once. In <b>phase 2</b>, the leader sends a POLL with the union fingerprint. Nodes that missed some uploads request, and only they receive a catch-up stream; if nobody requests, phase 2 costs one frame. A final beacon round verifies that all fingerprints are equal.</p>
+
+<h2>6. Methodology</h2>
+<h3>6.1 Simulator</h3>
+<p>We wrote a discrete-event simulator in Python (about 1,100 lines, five files; Appendix A). It contains:</p>
+<ul>
+<li>A byte-exact RIBLT encoder and streaming decoder that follows the reference design [1, 19], with BLAKE2b-64 hashing and the reference index-mapping generator. It accepts out-of-order (repaired) symbols.</li>
+<li>Equation (1) for airtime.</li>
+<li>Per-device duty-cycle enforcement: after each frame, the device is silent for T(1/δ − 1).</li>
+<li>A shared single-hop channel with one transmission at a time.</li>
+<li>Per-link frame loss, either Bernoulli or Gilbert–Elliott bursts [16] with a mean burst length of 4 frames.</li>
+<li>Radio energy from the SX1276/77/78 datasheet [10]: 87 mA TX at +17 dBm, 10.8 mA RX, 3.3 V.</li>
+</ul>
+<p>Receivers spend RX energy only while they are expected to listen.</p>
+
+<h3>6.2 Protocols compared</h3>
+<ul>
+<li><b>EchoSync (2-phase)</b>: Section 5, with repair.</li>
+<li><b>EchoSync (1-phase)</b>: the original design.</li>
+<li><b>Pairwise RIBLT (star)</b>: the elected leader runs sequential bidirectional RIBLT sessions with every node. The node streams symbols, the leader replies MORE (with the same NACK repair, for fairness) or sends the missing records reliably. Two passes are needed so that early nodes also receive later nodes' records. This baseline uses the same code, so the comparison isolates <i>broadcast versus pairwise</i>.</li>
+<li><b>Full-state broadcast</b>: each node broadcasts its entire set once, idealized with perfect scheduling and no loss or collisions.</li>
+<li><b>Oracle</b>: every record that is missing anywhere is sent exactly once. This is an information lower bound and not a real protocol.</li>
+</ul>
+
+<h3>6.3 Workload and parameters</h3>
+<p>Nodes share a history of 1,000 records. Each node misses each historical record with probability 3% and holds 5–20 fresh records of its own, so a typical gap is d ≈ 85–100. Defaults: SF9, BW 125 kHz, CR 4/5, δ = 1%, K = 4, B = 2, 4 request slots, a 30 s recovery timeout and a 5 s unicast timeout. Each configuration was repeated with independent seeds: 20–30 seeds per point (8 at N ≥ 50, 100 for codec points with d ≤ 100). We report means with 95% confidence intervals (shaded bands and error bars in the figures).</p>
+
+<h3>6.4 Validation</h3>
+<p>Automated tests (<span class="mono">test_sim.py</span>, all passing) check the following:</p>
+<ul>
+<li>Airtime matches the Semtech calculator (SF7/20 B: 56.58 ms; SF12/51 B: 2,465.79 ms).</li>
+<li>Decoding full sets recovers the exact difference in both directions.</li>
+<li>The difference stream is bit-identical to subtracting two full-set streams, which justifies simulating receivers by their differences.</li>
+<li>Overhead at d = 1,000 falls in 1.30–1.45, matching [1].</li>
+<li>Decoding survives 30% symbol loss.</li>
+<li>EchoSync and the pairwise baseline converge under 0%, 20% and 30%-burst loss.</li>
+</ul>
+
+<h2>7. Results</h2>
+<h3>7.1 Coding overhead (H2)</h3>
+<figure><img src="figs/fig_overhead.svg" style="width:58%">
+<figcaption><b>Figure 2.</b> Coded symbols needed per differing item. The broadcast curve is the maximum over 10 receivers that each lack a different random d items from one stream. Bands show 95% confidence intervals.</figcaption></figure>
+<p>Unicast overhead peaks at 1.71 for d = 10 and falls to 1.38 at d = 1,000, which reproduces [1]. A broadcast must wait for its slowest receiver, so its overhead is higher at small d (2.61 at d = 10) but within 10.8% of unicast at d = 100 and within 3.6% at d = 1,000 (Table 3). Measured against the information bound d, the overhead never comes within 15% (the minimum is 1.38). <b>H2 is rejected in reading (i). In reading (ii) it is supported for d ≥ 100 but not for small differences.</b></p>
+<table>
+<caption><b>Table 3.</b> Mean coded symbols per differing item, by set difference d.</caption>
+<thead><tr><th>d</th><th class="n">10</th><th class="n">20</th><th class="n">50</th><th class="n">100</th><th class="n">200</th><th class="n">500</th><th class="n">1000</th></tr></thead>
+<tbody>
+<tr><td>Unicast (1 receiver)</td><td class="n">1.71</td><td class="n">1.64</td><td class="n">1.52</td><td class="n">1.47</td><td class="n">1.41</td><td class="n">1.38</td><td class="n">1.38</td></tr>
+<tr><td>Broadcast (10 receivers)</td><td class="n">2.61</td><td class="n">2.22</td><td class="n">1.79</td><td class="n">1.63</td><td class="n">1.52</td><td class="n">1.46</td><td class="n">1.43</td></tr>
+<tr><td>Broadcast vs unicast</td><td class="n">+52%</td><td class="n">+35%</td><td class="n">+18%</td><td class="n">+10.8%</td><td class="n">+8.0%</td><td class="n">+5.7%</td><td class="n">+3.6%</td></tr>
+</tbody></table>
+
+<h3>7.2 Node scaling (RQ1, H1)</h3>
+<figure><img src="figs/fig_scaling.svg" style="width:100%">
+<figcaption><b>Figure 3.</b> Lossless node scaling at SF9, both axes logarithmic. (a) Total airtime of all transmitters. (b) Time until every node holds the union, under 1% duty cycle. The legend in (a) applies to both panels.</figcaption></figure>
+<p>EchoSync's airtime grows slowly with N: a single stream is followed by uploads that are proportional to the number of new records. Pairwise airtime grows roughly quadratically: there are about 2N sessions, and the second-pass gaps themselves grow with N. EchoSync stays within 1.3–1.7× of the oracle lower bound for N ≥ 10 (2.6× at N = 3, where fixed costs such as beacons dominate). Full-state broadcast costs 9–26× more airtime than EchoSync. Its wall time looks short only because the idealized model lets 100 radios share their duty budgets perfectly with zero collisions, while keeping the channel 98% busy, which an ALOHA LoRa channel cannot sustain [11].</p>
+<table>
+<caption><b>Table 4.</b> Lossless scaling, means over seeds. "Converged" is the fraction of nodes holding the union at the end.</caption>
+<thead><tr><th class="n">N</th><th class="n">EchoSync airtime (s)</th><th class="n">Pairwise airtime (s)</th><th class="n">Airtime saved</th><th class="n">EchoSync time</th><th class="n">Pairwise time</th><th class="n">Time saved</th><th class="n">1-phase converged</th></tr></thead>
+<tbody>
+<tr><td class="n">3</td><td class="n">30.5</td><td class="n">55.8</td><td class="n">45.4%</td><td class="n">0.66 h</td><td class="n">1.35 h</td><td class="n">50.8%</td><td class="n">0%</td></tr>
+<tr><td class="n">5</td><td class="n">39.4</td><td class="n">136.9</td><td class="n">71.2%</td><td class="n">0.76 h</td><td class="n">3.39 h</td><td class="n">77.8%</td><td class="n">0%</td></tr>
+<tr><td class="n">10</td><td class="n">57.3</td><td class="n">473.4</td><td class="n">87.9%</td><td class="n">0.90 h</td><td class="n">12.2 h</td><td class="n">92.7%</td><td class="n">0%</td></tr>
+<tr><td class="n">20</td><td class="n">90.4</td><td class="n">1,730.8</td><td class="n">94.8%</td><td class="n">1.14 h</td><td class="n">46.0 h</td><td class="n">97.5%</td><td class="n">0%</td></tr>
+<tr><td class="n">50</td><td class="n">197.4</td><td class="n">10,307</td><td class="n">98.1%</td><td class="n">1.96 h</td><td class="n">11.7 d</td><td class="n">99.3%</td><td class="n">0%</td></tr>
+<tr><td class="n">100</td><td class="n">363.6</td><td class="n">39,547</td><td class="n">99.1%</td><td class="n">3.21 h</td><td class="n">45.3 d</td><td class="n">99.7%</td><td class="n">0%</td></tr>
+</tbody></table>
+<p><b>H1a (no loss): supported.</b> Phase 1 took 1.004–1.012× the slowest single-receiver session on average, with a worst run of 1.048×. <b>H1a (10% loss): not supported.</b> The ratio rose to 1.11–1.37× on average, with a worst run of 1.71×, because the broadcast waits for the unluckiest of N−1 lossy receivers. <b>H1b: supported for N ≥ 5</b>, with time saved of 77.8–99.7% without loss and 71.8–99.5% at 10% loss. At N = 3 the saving was 50.8% without loss but only 45.5% at 10% loss, just under the hypothesis.</p>
+
+<h3>7.3 Heterogeneous state gaps (RQ2)</h3>
+<figure><img src="figs/fig_hetero.svg" style="width:100%">
+<figcaption><b>Figure 4.</b> Ten nodes; node 9 misses a growing fraction of the shared history (100% means a new node that joins with an empty set). (a) Phase-1 broadcast time versus the slowest single pairwise stream. (b) Total radio energy with and without early sleep.</figcaption></figure>
+<p>Broadcast duration is set almost entirely by the largest gap. Even for a node that joins empty (d ≈ 1,007), phase 1 lasted 1.001× the time needed to sync that node alone. The other eight receivers are served "for free" inside the same stream. Without early sleep, fast nodes would keep listening for the laggard. Early sleep cut network radio energy by 26% at a 25% gap and by 39% for an empty joiner (85.6 J vs 141.2 J). End to end, the empty joiner case converged in 6.2 h with EchoSync versus 20.6 h with pairwise sessions.</p>
+
+<h3>7.4 Packet loss and prefix repair (RQ3, H3)</h3>
+<figure><img src="figs/fig_loss.svg" style="width:100%">
+<figcaption><b>Figure 5.</b> Total airtime with 10 nodes as frame loss grows (30 seeds per point). Prefix repair removes the heavy tail that otherwise dominates at ≥ 20% loss.</figcaption></figure>
+<table>
+<caption><b>Table 5.</b> Loss experiment (N = 10). "Symbols / d<sub>max</sub>" counts new coded symbols relative to the largest gap; "recoveries" counts 30 s timeouts per run.</caption>
+<thead><tr><th>Loss</th><th class="n">Airtime, repair (s)</th><th class="n">Airtime, no repair (s)</th><th class="n">Pairwise (s)</th><th class="n">Symbols / d<sub>max</sub> (repair / none)</th><th class="n">Recoveries (repair / none)</th><th class="n">Time, repair</th><th class="n">Converged</th></tr></thead>
+<tbody>
+<tr><td>0%</td><td class="n">57.8</td><td class="n">53.7</td><td class="n">482.7</td><td class="n">1.59 / 1.59</td><td class="n">0 / 0</td><td class="n">0.90 h</td><td class="n">100%</td></tr>
+<tr><td>10% iid</td><td class="n">82.8</td><td class="n">73.5</td><td class="n">554.9</td><td class="n">2.01 / 2.36</td><td class="n">0.4 / 0.5</td><td class="n">1.51 h</td><td class="n">100%</td></tr>
+<tr><td>20% iid</td><td class="n">103.5</td><td class="n">113.0</td><td class="n">654.4</td><td class="n">2.19 / 4.32</td><td class="n">0.4 / 4.7</td><td class="n">2.03 h</td><td class="n">100%</td></tr>
+<tr><td>30% iid</td><td class="n">125.6</td><td class="n">395.7</td><td class="n">777.1</td><td class="n">2.34 / 20.7</td><td class="n">0.7 / 80.6</td><td class="n">2.55 h</td><td class="n">100%</td></tr>
+<tr><td>10% burst</td><td class="n">84.4</td><td class="n">115.6</td><td class="n">561.7</td><td class="n">2.12 / 5.05</td><td class="n">0.7 / 7.4</td><td class="n">1.58 h</td><td class="n">100%</td></tr>
+<tr><td>30% burst</td><td class="n">133.4</td><td class="n">298.4</td><td class="n">782.0</td><td class="n">2.71 / 14.5</td><td class="n">4.0 / 76.1</td><td class="n">2.81 h</td><td class="n">100%</td></tr>
+</tbody></table>
+<p><b>H3: supported.</b> All 300 loss runs converged, with verified fingerprints, at every rate from 0% to 30%, for both independent and bursty loss. Without repair, convergence still happened but was erratic: at 30% independent loss, the 95th-percentile airtime was 1,009 s versus 139 s with repair. Repair costs a little at low loss, because the 8-byte NACK and its slots add about 9 s at 10% loss. It pays off from 20% loss upward, and at 30% it reduced airtime 3.2× and timeouts 115×. Even at 30% loss, EchoSync used 6.2× less airtime than pairwise sync and finished in 2.6 h versus 20.3 h.</p>
+
+<h3>7.5 Additional experiments</h3>
+<table>
+<caption><b>Table 6.</b> Asymmetric links, spreading factor and batch size (N = 10; means over 15–20 seeds).</caption>
+<thead><tr><th>Configuration</th><th class="n">EchoSync airtime (s)</th><th class="n">EchoSync time</th><th class="n">Pairwise airtime (s)</th><th class="n">Pairwise time</th></tr></thead>
+<tbody>
+<tr><td>All links 5% loss</td><td class="n">71.6</td><td class="n">1.24 h</td><td class="n">505.6</td><td class="n">13.0 h</td></tr>
+<tr><td>1 far node at 30%, rest 5%</td><td class="n">89.4</td><td class="n">1.69 h</td><td class="n">567.0</td><td class="n">14.7 h</td></tr>
+<tr><td>3 far nodes at 30%, rest 5%</td><td class="n">107.8</td><td class="n">2.14 h</td><td class="n">651.9</td><td class="n">17.0 h</td></tr>
+<tr><td>SF7 (short range)</td><td class="n">14.2</td><td class="n">0.23 h</td><td class="n">132.2</td><td class="n">3.33 h</td></tr>
+<tr><td>SF9 (default)</td><td class="n">57.3</td><td class="n">0.89 h</td><td class="n">469.2</td><td class="n">12.1 h</td></tr>
+<tr><td>SF12 (maximum range)</td><td class="n">956.5</td><td class="n">10.4 h</td><td class="n">5,419</td><td class="n">138.7 h</td></tr>
+<tr><td>Batch B = 1 / 2 / 4 / 8, no loss</td><td class="n">72.8 / 57.3 / 50.0 / 46.8</td><td class="n">0.89–0.94 h</td><td class="n">–</td><td class="n">–</td></tr>
+<tr><td>Batch B = 1 / 2 / 4 / 8, 20% loss</td><td class="n">120.9 / 103.2 / 93.7 / 92.9</td><td class="n">1.99–2.09 h</td><td class="n">–</td><td class="n">–</td></tr>
+</tbody></table>
+<p>All asymmetric and spreading-factor runs converged. At SF12, the slowest and longest-range setting, a 10-node network synchronizes in about 10 hours with EchoSync. Pairwise sync takes almost 6 days, which makes it impractical. Larger batches mean fewer request windows. B = 4 was slightly better than the pre-chosen B = 2, and B = 8 sent 34% more symbols under loss. We kept B = 2 as defined before the experiments and note B = 4 as a tuning option.</p>
+<p><b>CRDT convergence.</b> In 300 runs (0%, 20% and 30% loss), 10 nodes each issued 5–30 concurrent last-writer-wins updates on 20 shared keys, about 177 operations per run with every key conflicting. In all 300/300 runs, every replica ended with an identical state that matched a centralized reference.</p>
+
+<h2>8. Discussion</h2>
+<table>
+<caption><b>Table 7.</b> Hypothesis verdicts.</caption>
+<thead><tr><th>Hypothesis</th><th>Verdict</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td>H1a: broadcast ≤ 1.1× largest session</td><td><span class="ok">Supported</span> without loss; <span class="no-ok">not supported</span> at 10% loss</td><td>1.01× mean (max 1.05×); 1.11–1.37× mean (max 1.71×) under loss</td></tr>
+<tr><td>H1b: ≥ 50% time reduction</td><td><span class="ok">Supported</span> for N ≥ 5; <span class="part">borderline</span> at N = 3</td><td>77.8–99.7% saved; N = 3: 50.8% (no loss), 45.5% (10% loss)</td></tr>
+<tr><td>H2: symbols within 15% of minimum</td><td><span class="no-ok">Rejected</span> vs d; <span class="part">supported</span> vs unicast RIBLT for d ≥ 100</td><td>Codec overhead ≥ 1.38; broadcast penalty +10.8% at d = 100, +52% at d = 10</td></tr>
+<tr><td>H3: converges at 10–30% loss</td><td><span class="ok">Supported</span></td><td>300/300 runs; repair keeps the cost to 2.2× the lossless cost at 30%</td></tr>
+</tbody></table>
+<p><b>Where the savings come from.</b> Pairwise synchronization pays for every gap separately, and every session waits on two duty-cycle budgets. EchoSync pays roughly once for the largest gap, plus about one transmission per genuinely new record. That is why its cost tracks the oracle bound (1.3–1.7× for N ≥ 10) instead of growing with N.</p>
+<p><b>Leader hotspot.</b> The leader transmits nearly half of all airtime (45% at N = 10), so its battery and duty budget are the bottleneck. Wall time scales as 1/δ. Two remedies follow directly, and both are future work: rotate leadership between rounds, which the deterministic election makes easy, and use the EU868 sub-band that allows a 10% duty cycle for the stream.</p>
+<p><b>Microcontroller memory.</b> The original paper listed SRAM as a limit without numbers. A receiver stores about 1.4·d received symbols (28 B each in RAM) plus the recovered records (16 B each). The local set's symbols can be computed on the fly from flash. A gap of d = 1,000 therefore needs about 56 kB, and a 300 kB budget on an ESP32 (520 kB SRAM) supports a gap of about 5,000 records per session. Larger gaps can be split into several sessions.</p>
+<p><b>Changes made to the original design as a result of this study:</b></p>
+<ul>
+<li>A two-phase protocol, because one phase never converges.</li>
+<li>Prefix repair with NACK bitmaps.</li>
+<li>Collision-tolerant busy-tone request windows, which solve the acknowledgment storm.</li>
+<li>Fingerprint-based termination.</li>
+<li>Message-free leader election.</li>
+<li>Hardware corrected so that the radio matches the band (Section 10).</li>
+<li>Multi-hop moved to future work, because the single-hop design is what was evaluated.</li>
+</ul>
+
+<h2>9. Limitations</h2>
+<ul>
+<li><b>Simulation only.</b> No hardware measurements are reported yet. Radio behavior such as the capture effect, clock drift, CAD reliability and receive-to-transmit turnaround is modeled ideally or not at all.</li>
+<li><b>Single hop.</b> All nodes are assumed to hear each other, apart from loss. Multi-hop relaying (1–5 hops in the original plan) was not evaluated.</li>
+<li><b>Channel model.</b> Transmissions within the protocol are serialized. Interference from other LoRa networks is represented only by the loss rate. The full-state baseline is idealized in its favor.</li>
+<li><b>Static membership during a round.</b> Nodes joining or leaving mid-session and records created during a session are not simulated; new records simply wait for the next round.</li>
+<li><b>Workload.</b> The workload is synthetic, with uniform random gaps and fixed 16-byte records. Real data may cluster, and larger records would need fragmentation.</li>
+<li><b>Security.</b> No authentication is included. A malicious node could inject records or false fingerprints. Signed records are future work.</li>
+</ul>
+
+<h2>10. Conclusion and Future Work</h2>
+<p>A single rateless broadcast can serve many receivers with different gaps at almost the cost of serving the worst one. Turning that idea into a working LoRa protocol required two corrections that only appeared through implementation and measurement: a second phase to move records <i>toward</i> the leader, and prefix repair to survive loss. With both corrections, EchoSync converged in every simulated run. It used 88–99% less airtime than pairwise RIBLT for 10–100 nodes and synchronized a 100-node network in about 3 hours instead of about 45 days.</p>
+<p><b>Next step: hardware validation.</b> Six ESP32 nodes will be built with radios matched to the band. The SX1278 covers 137–525 MHz and is therefore used at 433 MHz. The SX1276 is used at 868 MHz. The tests will measure real airtime, loss and battery current against these predictions. Further work: multi-hop clustering, leader rotation, the 10% duty-cycle sub-band, authenticated records, and nodes joining and leaving during operation.</p>
+
+<h2>Ethical Considerations</h2>
+<p>All planned radio experiments use licence-exempt ISM/SRD bands (433 MHz or 868 MHz) within the power and duty-cycle limits of the applicable national regulator. The study involves no human or animal subjects, and the simulated datasets contain no personal data.</p>
+
+<h2>Acknowledgments</h2>
+<p class="small">[Mentor / teacher acknowledgment.] [Disclosure of any assistance received, including AI tools, as required by ISEF rules.]</p>
+
+<h2>References</h2>
+<ol class="refs">
+<li>L. Yang, Y. Gilad, M. Alizadeh. Practical Rateless Set Reconciliation. <i>Proc. ACM SIGCOMM</i>, 2024. arXiv:2402.02668.</li>
+<li>D. Eppstein, M. T. Goodrich, F. Uyeda, G. Varghese. What's the Difference? Efficient Set Reconciliation without Prior Context. <i>Proc. ACM SIGCOMM</i>, 2011.</li>
+<li>M. T. Goodrich, M. Mitzenmacher. Invertible Bloom Lookup Tables. <i>Proc. 49th Allerton Conference</i>, 2011.</li>
+<li>Y. Minsky, A. Trachtenberg, R. Zippel. Set Reconciliation with Nearly Optimal Communication Complexity. <i>IEEE Trans. Information Theory</i> 49(9), 2003.</li>
+<li>M. Shapiro, N. Preguiça, C. Baquero, M. Zawirski. Conflict-Free Replicated Data Types. <i>Proc. SSS</i>, LNCS 6976, 2011.</li>
+<li>P. Levis, N. Patel, D. Culler, S. Shenker. Trickle: A Self-Regulating Algorithm for Code Propagation and Maintenance in Wireless Sensor Networks. <i>Proc. USENIX NSDI</i>, 2004.</li>
+<li>J. W. Byers, M. Luby, M. Mitzenmacher, A. Rege. A Digital Fountain Approach to Reliable Distribution of Bulk Data. <i>Proc. ACM SIGCOMM</i>, 1998.</li>
+<li>M. Luby. LT Codes. <i>Proc. IEEE FOCS</i>, 2002.</li>
+<li>Semtech. AN1200.13: LoRa Modem Designer's Guide, 2013.</li>
+<li>Semtech. SX1276/77/78/79 Datasheet, Rev. 7, 2020.</li>
+<li>M. Bor, U. Roedig, T. Voigt, J. Alonso. Do LoRa Low-Power Wide-Area Networks Scale? <i>Proc. ACM MSWiM</i>, 2016.</li>
+<li>A. Augustin, J. Yi, T. Clausen, W. M. Townsley. A Study of LoRa: Long Range &amp; Low Power Networks for the Internet of Things. <i>Sensors</i> 16(9):1466, 2016.</li>
+<li>F. Adelantado, X. Vilajosana, P. Tuset-Peiro, B. Martinez, J. Melià-Seguí, T. Watteyne. Understanding the Limits of LoRaWAN. <i>IEEE Communications Magazine</i> 55(9), 2017.</li>
+<li>ETSI EN 300 220-2: Short Range Devices (SRD) operating in the frequency range 25 MHz to 1 000 MHz, Part 2. V3.2.1, 2018.</li>
+<li>LoRa Alliance. RP002-1.0.4 LoRaWAN Regional Parameters, 2022.</li>
+<li>E. N. Gilbert. Capacity of a Burst-Noise Channel. <i>Bell System Technical Journal</i> 39(5), 1960.</li>
+<li>L. Lamport. Time, Clocks, and the Ordering of Events in a Distributed System. <i>Communications of the ACM</i> 21(7), 1978.</li>
+<li>Ink &amp; Switch. Syncing Keyhive: Rateless Invertible Bloom Lookup Tables. Lab notebook 05, 2025. inkandswitch.com/keyhive/notebook/05/</li>
+<li>L. Yang. riblt: reference implementation of Rateless IBLT (Go). github.com/yangl1996/riblt</li>
+<li>M. Kleppmann, A. Wiggins, P. van Hardenberg, M. McGranaghan. Local-First Software: You Own Your Data, in Spite of the Cloud. <i>Proc. ACM Onward!</i>, 2019.</li>
+<li>CEPT/ERC. Recommendation 70-03: Relating to the Use of Short Range Devices (SRD), latest amendment.</li>
+</ol>
+
+<h2>Appendix A. Reproducibility</h2>
+<p class="small">The simulator has five Python files:</p>
+<ul class="small">
+<li><span class="mono">riblt.py</span>: codec.</li>
+<li><span class="mono">sim.py</span>: PHY, channel and protocols.</li>
+<li><span class="mono">experiments.py</span>: all 2,782 runs, about 9 minutes on 2 CPU cores.</li>
+<li><span class="mono">analyze.py</span>: figures and summary statistics.</li>
+<li><span class="mono">test_sim.py</span>: validation tests.</li>
+</ul>
+<p class="small">The only dependencies are numpy and matplotlib. Run <span class="mono">python test_sim.py &amp;&amp; python experiments.py &amp;&amp; python analyze.py</span>. Every random choice is seeded, so all figures and tables can be regenerated bit-for-bit.</p>
+</body>
+</html>
